@@ -36,5 +36,7 @@ def save_output(output_path, content, output_type='txt'):
 
 def run_task3(image_path, config):
     # TODO: Implement task 3 here
+    
+    # use feature estractors to extract meaningful things from digit shapes for the model to learn from to then use the model here to predict the digits in the image
     output_path = f"output/task3/result.txt"
     save_output(output_path, "Task 3 output", output_type='txt')

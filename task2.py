@@ -17,6 +17,7 @@
 # Last Modified: 2024-09-09
 
 import os
+import cv2 as cv2
 
 
 def save_output(output_path, content, output_type='txt'):
@@ -35,6 +36,22 @@ def save_output(output_path, content, output_type='txt'):
 
 
 def run_task2(image_path, config):
-    # TODO: Implement task 2 here
+    image = cv2.imread(image_path)
+    if image is None:
+        print(f"Error: Unable to load image at {image_path}")
+        return
+    
+    # Using gaussion filtering to remove noise
+
+    # Convert image from RGB to HSV to separate hue from intensity and use value channel (brightness) for thresholding to eleminate different background colours
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    hue, saturation, value = cv2.split(hsv_image)
+    
+    # Use an if statrement to see if overall croped image is darker or lighter. If its mostly light then text must be dark so invert image to make text white on darker background
+    
+    # could apply dilation to make digits more visible for detector but only if their white as dilation makes white areas larger and black areas smaller 
+    
+    #  Contour Detection for Segmentation of individual Digits
+     
     output_path = f"output/task2/result.txt"
     save_output(output_path, "Task 2 output", output_type='txt')

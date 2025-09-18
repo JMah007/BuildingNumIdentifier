@@ -36,5 +36,9 @@ def save_output(output_path, content, output_type='txt'):
 
 def run_task1(image_path, config):
     # TODO: Implement task 1 here
+    # convert to grayscale 
+    # might use mser to detetc localised region of numbers as they work well with text in natural images
+    
+    # could apply dilation to make digits more visible for detector but only if their white as dilation makes white areas larger and black areas smaller 
     output_path = f"output/task1/result.txt"
     save_output(output_path, "Task 1 output", output_type='txt')
