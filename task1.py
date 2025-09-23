@@ -39,6 +39,12 @@ def run_task1(image_path, config):
     # convert to grayscale 
     # might use mser to detetc localised region of numbers as they work well with text in natural images
     
+    # Filter by appearance: After MSER, filter out irrelevant regions by exploiting prior knowledge:
+# -	Keep white-on-black regions.
+# -	Drop regions that look like bricks/other colors/textures.
+# -	This prunes to a small set (ideally ~10–20 candidate regions).
+
+    
     # could apply dilation to make digits more visible for detector but only if their white as dilation makes white areas larger and black areas smaller 
     output_path = f"output/task1/result.txt"
     save_output(output_path, "Task 1 output", output_type='txt')

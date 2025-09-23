@@ -48,7 +48,6 @@ def run_task2(image_path, config):
     gray_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         
-        
     processed = cv2.equalizeHist(gray_img)
     
     #using median blur to remove salt and pepper noise while preserving edges better than gaussian blur
@@ -80,7 +79,8 @@ def run_task2(image_path, config):
     count = 1
     for cnt in contours:
         x, y, w, h = cv2.boundingRect(cnt)
-        if w > 7 and h > 14:  # Filter small contours
+        aspect_ratio = h / float(w) 
+        if (w > 10 and h > 20) and (1.0 < aspect_ratio):  # Filter out small contours and contours wider than they are tall
             digit = image[y:y+h, x:x+w]
             digit_path = os.path.join(digit_folder, f"c{count}.png")
             cv2.imwrite(digit_path, digit)
@@ -94,4 +94,3 @@ def run_task2(image_path, config):
 
     output_path = f"output/task2/processed_image.png"
     save_output(output_path, processed, output_type='image')
-    save_output(output_path, gray_img, output_type='image')
