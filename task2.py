@@ -50,20 +50,32 @@ def run_task2(image_path, config):
         
     processed = cv2.equalizeHist(gray_img)
     
-    #using median blur to remove salt and pepper noise while preserving edges better than gaussian blur
-    processed = cv2.medianBlur(processed, ksize=5)
+    # Get dimensions of the cropped number region so i can apply different preprocessing for different sized images
+    h, w = processed.shape[:2]
+    
+    if w > 300 or h > 200: # image is fairly large
+        #using median blur to remove salt and pepper noise while preserving edges better than gaussian blur
+        processed = cv2.medianBlur(processed, ksize=5)
 
-
-    # need to make white parts even more whiter and black parts even more blacker to make thresholdin  g easier
     # might use adaptive thresholding as lighting might be uneven across the image
+    # Thresholding to get binary image as contour only works on binary images. Smaller 5th parameter preserves more detail in digits
+        processed = cv2.adaptiveThreshold(processed, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                cv2.THRESH_BINARY, 11, 7)
+        
+        # could apply dilation to make digits more visible for detector but only if their white as dilation makes white areas larger and black areas smaller (need to eleminate white in background)
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+        processed = cv2.morphologyEx(processed, cv2.MORPH_OPEN, kernel, iterations=2)
     
-   # Thresholding to get binary image as contour only works on binary images. Smaller 5th parameter preserves more detail in digits
-    processed = cv2.adaptiveThreshold(processed, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                              cv2.THRESH_BINARY, 11, 5)
     
-     # could apply dilation to make digits more visible for detector but only if their white as dilation makes white areas larger and black areas smaller (need to eleminate white in background)
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-    processed = cv2.morphologyEx(processed, cv2.MORPH_OPEN, kernel, iterations=2)
+    else: # image is fairly small
+        processed = cv2.medianBlur(processed, ksize=3)
+        
+        # Use otsu's thresholding as its better for smaller res images
+        _, processed = cv2.threshold(processed, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        
+        # could apply dilation to make digits more visible for detector but only if their white as dilation makes white areas larger and black areas smaller (need to eleminate white in background)
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+        processed = cv2.morphologyEx(processed, cv2.MORPH_OPEN, kernel, iterations=1)
 
 
     

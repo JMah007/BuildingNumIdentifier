@@ -58,7 +58,7 @@ def run_task3(image_path, config):
     
     # Used chatgpt to help with this part
     # Load training images and labels from folders named 0-9    
-    folder = f"/home/jaeden/BuildingNumIdentifier/training_data/0"
+    folder = f"/home/jaeden/training_data/0"
     for img_path in glob.glob(os.path.join(folder, "*.png")): 
         img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         img_resized = cv2.resize(img, (20, 20))
@@ -66,7 +66,7 @@ def run_task3(image_path, config):
             digit_images.append(img_resized)
             digit_labels.append(0)
 
-    folder = f"/home/jaeden/BuildingNumIdentifier/training_data/1"
+    folder = f"/home/jaeden/training_data/1"
     for img_path in glob.glob(os.path.join(folder, "*.png")): 
         img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         img_resized = cv2.resize(img, (20, 20))
@@ -74,7 +74,7 @@ def run_task3(image_path, config):
             digit_images.append(img_resized)
             digit_labels.append(1)
             
-    folder = f"/home/jaeden/BuildingNumIdentifier/training_data/2"
+    folder = f"/home/jaeden/training_data/2"
     for img_path in glob.glob(os.path.join(folder, "*.png")): 
         img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         img_resized = cv2.resize(img, (20, 20))
@@ -82,7 +82,7 @@ def run_task3(image_path, config):
             digit_images.append(img_resized)
             digit_labels.append(2)
             
-        folder = f"/home/jaeden/BuildingNumIdentifier/training_data/3"
+        folder = f"/home/jaeden/training_data/3"
     for img_path in glob.glob(os.path.join(folder, "*.png")): 
         img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         img_resized = cv2.resize(img, (20, 20))
@@ -90,7 +90,7 @@ def run_task3(image_path, config):
             digit_images.append(img_resized)
             digit_labels.append(3)
 
-    folder = f"/home/jaeden/BuildingNumIdentifier/training_data/4"
+    folder = f"/home/jaeden/training_data/4"
     for img_path in glob.glob(os.path.join(folder, "*.png")): 
         img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         img_resized = cv2.resize(img, (20, 20))
@@ -98,7 +98,7 @@ def run_task3(image_path, config):
             digit_images.append(img_resized)
             digit_labels.append(4)
             
-    folder = f"/home/jaeden/BuildingNumIdentifier/training_data/5"
+    folder = f"/home/jaeden/training_data/5"
     for img_path in glob.glob(os.path.join(folder, "*.png")): 
         img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         img_resized = cv2.resize(img, (20, 20))
@@ -106,7 +106,7 @@ def run_task3(image_path, config):
             digit_images.append(img_resized)
             digit_labels.append(5)
             
-        folder = f"/home/jaeden/BuildingNumIdentifier/training_data/6"
+        folder = f"/home/jaeden/training_data/6"
     for img_path in glob.glob(os.path.join(folder, "*.png")): 
         img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         img_resized = cv2.resize(img, (20, 20))
@@ -114,7 +114,7 @@ def run_task3(image_path, config):
             digit_images.append(img_resized)
             digit_labels.append(6)
 
-    folder = f"/home/jaeden/BuildingNumIdentifier/training_data/7"
+    folder = f"/home/jaeden/training_data/7"
     for img_path in glob.glob(os.path.join(folder, "*.png")): 
         img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         img_resized = cv2.resize(img, (20, 20))
@@ -122,7 +122,7 @@ def run_task3(image_path, config):
             digit_images.append(img_resized)
             digit_labels.append(7)
             
-    folder = f"/home/jaeden/BuildingNumIdentifier/training_data/8"
+    folder = f"/home/jaeden/training_data/8"
     for img_path in glob.glob(os.path.join(folder, "*.png")): 
         img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         img_resized = cv2.resize(img, (20, 20))
@@ -130,7 +130,7 @@ def run_task3(image_path, config):
             digit_images.append(img_resized)
             digit_labels.append(8)
             
-        folder = f"/home/jaeden/BuildingNumIdentifier/training_data/9"
+        folder = f"/home/jaeden/training_data/9"
     for img_path in glob.glob(os.path.join(folder, "*.png")): 
         img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         img_resized = cv2.resize(img, (20, 20))

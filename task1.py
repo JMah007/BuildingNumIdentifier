@@ -17,7 +17,7 @@
 # Last Modified: 2024-09-09
 
 import os
-
+import cv2 as cv2
 
 def save_output(output_path, content, output_type='txt'):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -35,11 +35,25 @@ def save_output(output_path, content, output_type='txt'):
 
 
 def run_task1(image_path, config):
-    # TODO: Implement task 1 here
+    image = cv2.imread(image_path)
+    if image is None:
+        print(f"Error: Unable to load image at {image_path}")
+        return
     # convert to grayscale 
-    # might use mser to detetc localised region of numbers as they work well with text in natural images
-    
-    # Filter by appearance: After MSER, filter out irrelevant regions by exploiting prior knowledge:
+    gray_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+
+    processed = cv2.equalizeHist(gray_img)
+    # apply gaussian blur to reduce noise and improve thresholding
+    processed = cv2.GaussianBlur(processed, (5, 5), 0)
+    # apply adaptive thresholding to get binary image
+    processed = cv2.adaptiveThreshold(processed, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
+
+
+
+
+
+
 # -	Keep white-on-black regions.
 # -	Drop regions that look like bricks/other colors/textures.
 # -	This prunes to a small set (ideally ~10–20 candidate regions).
