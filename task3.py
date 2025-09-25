@@ -159,7 +159,7 @@ def run_task3(image_path, config):
     
     
     # Train SVM
-    svm_linear = svm.SVC(kernel="linear")
+    svm_linear = svm.SVC(kernel="linear", C=1.0)
     svm_linear.fit(train_hog, train_hog_labels)
 
     # Predict
