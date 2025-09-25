@@ -1,0 +1,3 @@
+Should Yolo rewuired data be put in the data file such as weights
+
+is config file for yolo training hyperpoarameters as well. is anythign put here just for documentation purposes or is it retrieved by the program?

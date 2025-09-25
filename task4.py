@@ -17,6 +17,11 @@
 # Last Modified: 2024-09-09
 
 import os
+import cv2 as cv2
+
+from task1 import run_task1
+from task2 import run_task2    
+from task3 import run_task3 
 
 
 def save_output(output_path, content, output_type='txt'):
@@ -35,6 +40,11 @@ def save_output(output_path, content, output_type='txt'):
 
 
 def run_task4(image_path, config):
-    # TODO: Implement task 4 here
+    image = cv2.imread(image_path)
+    if image is None:
+        print(f"Error: Unable to load image at {image_path}")
+        return
+    run_task1(image_path, config)
+    
     output_path = f"output/task4/result.txt"
     save_output(output_path, "Task 4 output", output_type='txt')

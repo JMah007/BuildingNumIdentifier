@@ -16,6 +16,7 @@
 # Author: [Your Name]
 # Last Modified: 2024-09-09
 
+from fileinput import filename
 import os
 import torch
 import cv2 as cv2
@@ -35,19 +36,49 @@ def save_output(output_path, content, output_type='txt'):
         print("Unsupported output type. Use 'txt' or 'image'.")
 
 
+def find_highest_confidence(image, detections):
+    """ Find the candidate with highest confidence score and return the corresponding image crop.
+
+    Args:
+        image (numpy.ndarray): The input image.
+        detections (list): A list of detections, where each detection is a list
+            containing [x1, y1, x2, y2, confidence, class].
+
+    Returns:
+        numpy.ndarray: The cropped image of the highest confidence detection,
+            or None if no valid detections are found.
+    """
+    # Compare leftover candidates and choose one with highest confidence score
+    highest_conf = 0
+    best_crop = None
+    for det in detections:  
+        if det[4] > highest_conf:
+            highest_conf = det[4] # 5th parameter is confidence score
+            x1, y1, x2, y2, conf, cls = map(int, det[:6])  # convert to integers
+            best_crop = image[y1:y2, x1:x2]
+    return best_crop
+
+
+
+
 def run_task1(image_path, config):
     image = cv2.imread(image_path)
     if image is None:
         print(f"Error: Unable to load image at {image_path}")
         return
+    
+    # Extract label number from filename
+    filename = os.path.basename(image_path)  
+    digit = ''.join(filter(str.isdigit, filename)) 
 
-    # Load YOLOv5 model (once per session ideally)
+    # Load the YOLOv5 model
     model = torch.hub.load('/home/jaeden/yolov5', 'custom',
                            path='/home/jaeden/yolov5/runs/train/exp7/weights/best.pt',
                            source='local')
 
     # Prediction using the model
     results = model(image)
+    
     
     # If detections exist then loop through possible candidates and find most 
     # likely one and return one with highest confidence score or maybe can change to one thats largest area
@@ -59,18 +90,11 @@ def run_task1(image_path, config):
             
         # make sure after filtering there is still remaining candidates
         if filtered_detections.shape[0] != 0:
-            # Compare leftover candidates and choose one with highest confidence score
-            highest_conf = 0
-            best_crop = None
-            for det in filtered_detections:  
-                if det[4] > highest_conf:
-                    highest_conf = det[4] # 5th parameter is confidence score
-                    x1, y1, x2, y2, conf, cls = map(int, det[:6])  # convert to integers
-                    best_crop = image[y1:y2, x1:x2]
+            best_crop = find_highest_confidence(image, filtered_detections)
 
 
             # Save the cropped image
-            output_path = f"output/task1/result.jpg"
+            output_path = f"output/task1/bn{digit}.jpg"
             save_output(output_path, best_crop, output_type='image')
 
             # Print results
@@ -82,15 +106,7 @@ def run_task1(image_path, config):
         print("No detections found.")
         return
     
-    
-    
-
-
 
 # -	Keep white-on-black regions.
 # -	Drop regions that look like bricks/other colors/textures.
 # -	This prunes to a small set (ideally ~10–20 candidate regions).
-
-    
-    # could apply dilation to make digits more visible for detector but only if their white as dilation makes white areas larger and black areas smaller 
-
