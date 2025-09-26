@@ -16,6 +16,7 @@
 # Author: [Your Name]
 # Last Modified: 2024-09-09
 
+import glob
 import os
 import cv2 as cv2
 
@@ -40,11 +41,42 @@ def save_output(output_path, content, output_type='txt'):
 
 
 def run_task4(image_path, config):
-    image = cv2.imread(image_path)
-    if image is None:
-        print(f"Error: Unable to load image at {image_path}")
+    if not os.path.exists(image_path):
+        print(f"Error: Invalid image path provided: {image_path}")
         return
+
     run_task1(image_path, config)
+
+    # Task 2 processes all images produced by task 1
+    output_task1_dir = os.path.join(os.getcwd(), "output/task1")
+    run_task2(output_task1_dir, config)
     
-    output_path = f"output/task4/result.txt"
-    save_output(output_path, "Task 4 output", output_type='txt')
+    # Task 3 processes all images produced by task 2
+    output_task2_dir = os.path.join(os.getcwd(), "output/task2")
+    run_task3(output_task2_dir, config)
+
+
+    # combine characters for each building from output of task 3 into one file for each building 
+    output_task3_dir = os.path.join(os.getcwd(), "output/task3")
+    bn_folders = sorted(glob.glob(os.path.join(output_task3_dir, 'bn*')))
+    for bn_folder in bn_folders:
+        building_num = os.path.basename(bn_folder)  # e.g., 'bn3'
+        task3_bn_folder = os.path.join(output_task3_dir, building_num)
+        if not os.path.exists(task3_bn_folder):
+            print(f"Warning: Task 3 output folder for {building_num} does not exist. Skipping.")
+            
+            continue
+        
+        char_files = sorted(glob.glob(os.path.join(task3_bn_folder, '*.txt')))
+        combined_text = ""
+        for char_file in char_files:
+            with open(char_file, 'r') as f:
+                char = f.read().strip()
+                combined_text += char
+        
+        # Save combined text for the building number
+        output_path = os.path.join("output/task4", f"{building_num}.txt")
+        save_output(output_path, combined_text, output_type='txt')
+        print(f"Combined building number for {building_num}: {combined_text}")
+    
+

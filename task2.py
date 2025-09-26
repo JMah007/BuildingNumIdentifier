@@ -16,6 +16,7 @@
 # Author: [Your Name]
 # Last Modified: 2024-09-09
 
+import glob
 import os
 import cv2 as cv2
 from matplotlib import pyplot as plt
@@ -37,12 +38,15 @@ def save_output(output_path, content, output_type='txt'):
         print("Unsupported output type. Use 'txt' or 'image'.")
 
 
-def run_task2(image_path, config):
-    image = cv2.imread(image_path)
-    if image is None:
-        print(f"Error: Unable to load image at {image_path}")
-        return
+def preprocess_image(image):
+    """ Preprocess the input image for better contour detection.
 
+    Args:
+        image (numpy.ndarray): The input image.
+
+    Returns:
+        numpy.ndarray: The preprocessed image.
+    """
 
     # Convert image from RGB to HSV to separate hue from intensity and use value channel (brightness) for thresholding to eleminate different background colours
     gray_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -77,32 +81,68 @@ def run_task2(image_path, config):
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
         processed = cv2.morphologyEx(processed, cv2.MORPH_OPEN, kernel, iterations=1)
 
+    return processed
 
-    
-    # Find contours
-    contours, _ = cv2.findContours(processed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Filter and extract digit regions
-    import shutil
-    digit_folder = "output/task2/bn1"
+def extract_digits(image, contours, file_name_digit):
+    """ Extract and save digit regions from the image based on contours.
 
-    shutil.rmtree("output/task2/bn1")
-    os.makedirs(digit_folder, exist_ok=True)
+    Args:
+        image (numpy.ndarray): The input image.
+        contours (list): List of contours detected in the image.
+        digit_folder (str): Folder path to save the extracted digit images.
+    """
     count = 1
     for cnt in contours:
         x, y, w, h = cv2.boundingRect(cnt)
         aspect_ratio = h / float(w) 
-        if (w > 10 and h > 20) and (1.0 < aspect_ratio):  # Filter out small contours and contours wider than they are tall
+        if (w > 10 and h > 20) and (1.0 < aspect_ratio):  # Only consider contours that are likely to be digits based on size and aspect ratio
             digit = image[y:y+h, x:x+w]
-            digit_path = os.path.join(digit_folder, f"c{count}.png")
-            cv2.imwrite(digit_path, digit)
+
+            output_path = os.path.join(f"output/task2/bn{file_name_digit}", f"c{count}.png")
+            save_output(output_path, digit, output_type='image')
             count += 1
-            
-    contour_img = cv2.cvtColor(processed, cv2.COLOR_GRAY2BGR)
-    cv2.drawContours(contour_img, contours, -1, (0,255,0), 2)
-    cv2.imwrite("output/task2/contours_visual.png", contour_img)
 
 
+def run_task2(image_path, config):
+    """Run the second task of the pipeline.
 
-    output_path = f"output/task2/processed_image.png"
-    save_output(output_path, processed, output_type='image')
+    Args:
+        image_path (str): Path to the directory holding all the input images.
+        config (dict): Configuration parameters for the task.
+    """
+    
+    image_files = sorted(glob.glob(os.path.join(image_path, '*.png'))) # Extract the image files from the directory
+    
+    for img_path in image_files:
+        image = cv2.imread(img_path)
+        if image is None:
+            print(f"Error: Unable to load image at {image_path}")
+            return
+        
+        # Extract building filename label number to be later used in naming output files
+        filename = os.path.basename(img_path)  
+        file_name_digit = ''.join(filter(str.isdigit, filename)) 
+
+        pre_processed_image = preprocess_image(image)            
+        
+        contours, _ = cv2.findContours(pre_processed_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        extract_digits(image, contours, file_name_digit)
+
+        
+        
+        
+        
+        # # Save contour image and preprocessed image. Can delete this and below later
+        # output_dir = f"output/task2/bn{file_name_digit}"
+
+        # # Save contour image to visualise detected contours
+        # contour_img = cv2.cvtColor(pre_processed_image, cv2.COLOR_GRAY2BGR)
+        # cv2.drawContours(contour_img, contours, -1, (0,255,0), 2)
+        # contour_img_path = os.path.join(output_dir, "contours.png")
+        # save_output(contour_img_path, contour_img, output_type='image')
+
+        # # Save preprocessed image
+        # preprocessed_img_path = os.path.join(output_dir, "preprocessed.png")
+        # save_output(preprocessed_img_path, pre_processed_image, output_type='image')

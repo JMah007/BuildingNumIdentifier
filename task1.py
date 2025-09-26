@@ -20,6 +20,7 @@ from fileinput import filename
 import os
 import torch
 import cv2 as cv2
+import glob
 
 def save_output(output_path, content, output_type='txt'):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -59,53 +60,65 @@ def find_highest_confidence(image, detections):
     return best_crop
 
 
+def filter_detections(image, results, conf_threshold):
+    """ Filter detections that arent possible and then select the one with highest confidence score. Only one candidate should remain.
 
+    Args:
+        detections (list): A list of detections, where each detection is a list
+            containing [x1, y1, x2, y2, confidence, class].
+        conf_threshold (float): The confidence threshold to filter detections.
 
-def run_task1(image_path, config):
-    image = cv2.imread(image_path)
-    if image is None:
-        print(f"Error: Unable to load image at {image_path}")
-        return
+    Returns:
+        list: A list of filtered detections.
+    """
+    # filter out candidates that have lowest possibility of being a building number
     
-    # Extract label number from filename
-    filename = os.path.basename(image_path)  
-    digit = ''.join(filter(str.isdigit, filename)) 
+    for det in results.xyxy[0]:
+        print("Candidate has level : ", det[4])
+        filtered_detections = results.xyxy[0][results.xyxy[0][:, 4] >= conf_threshold]
+        
+    # make sure after filtering there is still remaining candidates
+    best_crop = None
+    if filtered_detections.shape[0] != 0:
+        best_crop = find_highest_confidence(image, filtered_detections)
 
-    # Load the YOLOv5 model
+        # Print results
+        results.print()
+        return best_crop
+    
+def run_task1(image_path, config):
+    
+    image_files = sorted(glob.glob(os.path.join(image_path, '*.jpg')))
+
+    # Load the YOLOv5 model once
     model = torch.hub.load('/home/jaeden/yolov5', 'custom',
                            path='/home/jaeden/yolov5/runs/train/exp7/weights/best.pt',
                            source='local')
 
-    # Prediction using the model
-    results = model(image)
-    
-    
-    # If detections exist then loop through possible candidates and find most 
-    # likely one and return one with highest confidence score or maybe can change to one thats largest area
-    if results.xyxy[0].shape[0] != 0:
-        # filter out candidates that have lowest possibility of being a building number
-        for det in results.xyxy[0]:
-            print("Candidate has level : ", det[4])
-            filtered_detections = results.xyxy[0][results.xyxy[0][:, 4] >= 0.6]
-            
-        # make sure after filtering there is still remaining candidates
-        if filtered_detections.shape[0] != 0:
-            best_crop = find_highest_confidence(image, filtered_detections)
+    for img_path in image_files:
+        image = cv2.imread(img_path)
+        if image is None:
+            print(f"Error: Unable to load image at {img_path}")
+            continue
 
+        # Extract label number from filename
+        filename = os.path.basename(img_path)
+        digit = ''.join(filter(str.isdigit, filename))
 
-            # Save the cropped image
-            output_path = f"output/task1/bn{digit}.jpg"
-            save_output(output_path, best_crop, output_type='image')
+        # Prediction using the model
+        results = model(image)
 
-            # Print results
-            results.print()
+        # If detections exist then loop through possible candidates and find most likely one
+        if results.xyxy[0].shape[0] != 0:
+            best_crop = filter_detections(image, results, 0.6) # hard code minimum confidence to 0.6
+            if best_crop is not None:
+                output_path = f"output/task1/bn{digit}.png"
+                save_output(output_path, best_crop, output_type='image')
+            else:
+                print(f"Detections found but none of them were deemed valid for {img_path}.")
         else:
-            print("No detections found.")
-            return
-    else:
-        print("No detections found.")
-        return
-    
+            print(f"No detections found for {img_path}.")
+
 
 # -	Keep white-on-black regions.
 # -	Drop regions that look like bricks/other colors/textures.
