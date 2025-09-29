@@ -1,6 +1,5 @@
 Should Yolo rewuired data be put in the data file such as weights
 
-is config file for yolo training hyperpoarameters as well. is anythign put here just for documentation purposes or is it retrieved by the program?
 
 is the text file in each task for writing terminal output to it?
 
@@ -9,5 +8,7 @@ is the text file in each task for writing terminal output to it?
 issues
 detecting things in neutral images so need more neutral images with lots of noise
 not not detecting large numbers on bricks so need more of those 
-not classifying digits correctly so need more data
+not classifying digits correctly so need more digit images from campus and need to augment them 
 need to add data for alphabet probably need to make my own using photos of campus alphabets
+Not segmenting well. Keeps including other false segments
+check all technqiues used are allowed

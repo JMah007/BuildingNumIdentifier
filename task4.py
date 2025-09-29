@@ -19,10 +19,13 @@
 import glob
 import os
 import cv2 as cv2
+import shutil
+
 
 from task1 import run_task1
 from task2 import run_task2    
 from task3 import run_task3 
+
 
 
 def save_output(output_path, content, output_type='txt'):
@@ -41,6 +44,18 @@ def save_output(output_path, content, output_type='txt'):
 
 
 def run_task4(image_path, config):
+    # Wipe contents of task 1, task 2 and task 3 output directories before running
+    for outdir in ["output/task1", "output/task2", "output/task3"]:
+        abs_outdir = os.path.join(os.getcwd(), outdir)
+        if os.path.exists(abs_outdir):
+            for filename in os.listdir(abs_outdir):
+                file_path = os.path.join(abs_outdir, filename)
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+                    
+                    
     if not os.path.exists(image_path):
         print(f"Error: Invalid image path provided: {image_path}")
         return
@@ -79,4 +94,3 @@ def run_task4(image_path, config):
         save_output(output_path, combined_text, output_type='txt')
         print(f"Combined building number for {building_num}: {combined_text}")
     
-

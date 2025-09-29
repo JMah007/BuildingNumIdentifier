@@ -71,8 +71,8 @@ def filter_detections(image, results, conf_threshold):
     Returns:
         list: A list of filtered detections.
     """
-    # filter out candidates that have lowest possibility of being a building number
     
+    # filter out candidates that have lowest possibility of being a building number
     for det in results.xyxy[0]:
         print("Candidate has level : ", det[4])
         filtered_detections = results.xyxy[0][results.xyxy[0][:, 4] >= conf_threshold]
@@ -108,9 +108,11 @@ def run_task1(image_path, config):
         # Prediction using the model
         results = model(image)
 
+
         # If detections exist then loop through possible candidates and find most likely one
         if results.xyxy[0].shape[0] != 0:
             best_crop = filter_detections(image, results, 0.6) # hard code minimum confidence to 0.6
+            
             if best_crop is not None:
                 output_path = f"output/task1/bn{digit}.png"
                 save_output(output_path, best_crop, output_type='image')
@@ -118,8 +120,4 @@ def run_task1(image_path, config):
                 print(f"Detections found but none of them were deemed valid for {img_path}.")
         else:
             print(f"No detections found for {img_path}.")
-
-
-# -	Keep white-on-black regions.
-# -	Drop regions that look like bricks/other colors/textures.
-# -	This prunes to a small set (ideally ~10–20 candidate regions).
+            
