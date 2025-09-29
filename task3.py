@@ -42,7 +42,7 @@ def save_output(output_path, content, output_type='txt'):
 
 
 def preprocess_image(image):    
-    """ Preprocess the input image for better contour detection.
+    """ Preprocess the input image for better segment detection.
 
     Args:
         image (numpy.ndarray): The input image.

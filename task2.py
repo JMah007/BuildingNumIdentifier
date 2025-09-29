@@ -39,7 +39,7 @@ def save_output(output_path, content, output_type='txt'):
 
 
 def preprocess_image(image):
-    """ Preprocess the input image for better contour detection.
+    """ Preprocess the input image for better segment detection.
 
     Args:
         image (numpy.ndarray): The input image.
@@ -62,7 +62,7 @@ def preprocess_image(image):
         processed = cv2.medianBlur(processed, ksize=5)
 
     # might use adaptive thresholding as lighting might be uneven across the image
-    # Thresholding to get binary image as contour only works on binary images. Smaller 5th parameter preserves more detail in digits
+    # Thresholding to get binary image as segment only works on binary images. Smaller 5th parameter preserves more detail in digits
         processed = cv2.adaptiveThreshold(processed, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                                 cv2.THRESH_BINARY, 11, 7)
         
@@ -85,11 +85,11 @@ def preprocess_image(image):
 
 
 def extract_digits(image, pre_processed_image, file_name_digit):
-    """ Extract and save digit regions from the image based on contours.
+    """ Extract and save digit regions from the image based on segments.
 
     Args:
         image (numpy.ndarray): The input image.
-        contours (list): List of contours detected in the image.
+        segments (list): List of segments detected in the image.
         digit_folder (str): Folder path to save the extracted digit images.
     """
     
@@ -149,14 +149,14 @@ def run_task2(image_path, config):
         
         
         
-        # # Save contour image and preprocessed image. Can delete this and below later
+        # # Save segment image and preprocessed image. Can delete this and below later
         # output_dir = f"output/task2/bn{file_name_digit}"
 
-        # # Save contour image to visualise detected contours
-        # contour_img = cv2.cvtColor(pre_processed_image, cv2.COLOR_GRAY2BGR)
-        # cv2.drawContours(contour_img, contours, -1, (0,255,0), 2)
-        # contour_img_path = os.path.join(output_dir, "contours.png")
-        # save_output(contour_img_path, contour_img, output_type='image')
+        # # Save segment image to visualise detected segments
+        # segment_img = cv2.cvtColor(pre_processed_image, cv2.COLOR_GRAY2BGR)
+        # cv2.drawsegments(segment_img, segments, -1, (0,255,0), 2)
+        # segment_img_path = os.path.join(output_dir, "segments.png")
+        # save_output(segment_img_path, segment_img, output_type='image')
 
         # # Save preprocessed image
         # preprocessed_img_path = os.path.join(output_dir, "preprocessed.png")
