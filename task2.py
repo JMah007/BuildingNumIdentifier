@@ -84,7 +84,7 @@ def preprocess_image(image):
     return processed
 
 
-def extract_digits(image, contours, file_name_digit):
+def extract_digits(image, pre_processed_image, file_name_digit):
     """ Extract and save digit regions from the image based on contours.
 
     Args:
@@ -92,16 +92,31 @@ def extract_digits(image, contours, file_name_digit):
         contours (list): List of contours detected in the image.
         digit_folder (str): Folder path to save the extracted digit images.
     """
+    
+    num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(pre_processed_image)
     count = 1
-    for cnt in contours:
-        x, y, w, h = cv2.boundingRect(cnt)
-        aspect_ratio = h / float(w) 
-        if (w > 10 and h > 20) and (1.0 < aspect_ratio):  # Only consider contours that are likely to be digits based on size and aspect ratio
-            digit = image[y:y+h, x:x+w]
+    img_area = image.shape[0] * image.shape[1]
+    min_area = img_area / 30
+    max_area = img_area / 3
 
-            output_path = os.path.join(f"output/task2/bn{file_name_digit}", f"c{count}.png")
-            save_output(output_path, digit, output_type='image')
-            count += 1
+    # Keep segments that meet minimum size requirements to filter our non digit segments
+    filtered_segments = []
+    for i in range(1, num_labels):  # 0 is the background so need to start from 1 
+        x, y, w, h, area = stats[i]
+        if (area > min_area) and (area < max_area) and (h > w):
+            filtered_segments.append((x, y, w, h, area))
+
+    # Select the 4 largest segments by area
+    filtered_segments = sorted(filtered_segments, key=lambda seg: seg[4], reverse=True)[:4]
+    # Sort those 4 by horizontal placement (left to right)
+    filtered_segments.sort(key=lambda segment: segment[0])
+
+    for segment in filtered_segments:
+        x, y, w, h, area = segment
+        digit = image[y:y+h, x:x+w]
+        output_path = os.path.join(f"output/task2/bn{file_name_digit}", f"c{count}.png")
+        save_output(output_path, digit, output_type='image')
+        count += 1
 
 
 def run_task2(image_path, config):
@@ -126,9 +141,9 @@ def run_task2(image_path, config):
 
         pre_processed_image = preprocess_image(image)            
         
-        contours, _ = cv2.findContours(pre_processed_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        extract_digits(image, contours, file_name_digit)
+
+        extract_digits(image, pre_processed_image, file_name_digit)
 
         
         

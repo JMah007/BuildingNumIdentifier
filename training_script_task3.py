@@ -111,8 +111,6 @@ for img_path in glob.glob(os.path.join(folder, "*.png")):
         
         
 # Below is my own made dataset with letters A-D and Digit 0-9    
-
-
 folder = f"/home/jaeden/training_data/CustomData/0"
 for img_path in glob.glob(os.path.join(folder, "*.jpg")): 
     img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
