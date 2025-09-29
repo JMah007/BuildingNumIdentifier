@@ -145,19 +145,3 @@ def run_task2(image_path, config):
 
         extract_digits(image, pre_processed_image, file_name_digit)
 
-        
-        
-        
-        
-        # # Save segment image and preprocessed image. Can delete this and below later
-        # output_dir = f"output/task2/bn{file_name_digit}"
-
-        # # Save segment image to visualise detected segments
-        # segment_img = cv2.cvtColor(pre_processed_image, cv2.COLOR_GRAY2BGR)
-        # cv2.drawsegments(segment_img, segments, -1, (0,255,0), 2)
-        # segment_img_path = os.path.join(output_dir, "segments.png")
-        # save_output(segment_img_path, segment_img, output_type='image')
-
-        # # Save preprocessed image
-        # preprocessed_img_path = os.path.join(output_dir, "preprocessed.png")
-        # save_output(preprocessed_img_path, pre_processed_image, output_type='image')
