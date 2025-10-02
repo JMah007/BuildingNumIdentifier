@@ -26,198 +26,31 @@ def extract_hog_features(images):
 
 
 
-# Used chatgpt to help with this part
-# Load training images and labels from folders named 0-9    
-folder = f"/home/jaeden/training_data/0"
-for img_path in glob.glob(os.path.join(folder, "*.png")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(0)
+# Used chatgpt to help with this part 
+# Microsoft. (2025). Copilot (GPT-4) [Large Language Model]. https://copilot.microsoft.com/
+# Below is the dataset from online database https://www.kaggle.com/datasets/dhruvmomoman/printed-digits?resource=download
+charList = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+for char in charList:
+    folder = f"/home/jaeden/training_data/{char}"
+    for img_path in glob.glob(os.path.join(folder, "*.png")): 
+        img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+        img_resized = cv2.resize(img, (20, 20))
+        if img is not None:
+            digit_images.append(img_resized)
+            digit_labels.append(char)
 
-folder = f"/home/jaeden/training_data/1"
-for img_path in glob.glob(os.path.join(folder, "*.png")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(1)
         
-folder = f"/home/jaeden/training_data/2"
-for img_path in glob.glob(os.path.join(folder, "*.png")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(2)
-        
-    folder = f"/home/jaeden/training_data/3"
-for img_path in glob.glob(os.path.join(folder, "*.png")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(3)
-
-folder = f"/home/jaeden/training_data/4"
-for img_path in glob.glob(os.path.join(folder, "*.png")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(4)
-        
-folder = f"/home/jaeden/training_data/5"
-for img_path in glob.glob(os.path.join(folder, "*.png")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(5)
-        
-    folder = f"/home/jaeden/training_data/6"
-for img_path in glob.glob(os.path.join(folder, "*.png")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(6)
-
-folder = f"/home/jaeden/training_data/7"
-for img_path in glob.glob(os.path.join(folder, "*.png")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(7)
-        
-folder = f"/home/jaeden/training_data/8"
-for img_path in glob.glob(os.path.join(folder, "*.png")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(8)
-        
-folder = f"/home/jaeden/training_data/9"
-for img_path in glob.glob(os.path.join(folder, "*.png")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(9)
-        
-        
-        
-# Below is my own made dataset with letters A-D and Digit 0-9    
-folder = f"/home/jaeden/training_data/CustomData/0"
+# Below is my own made dataset with letters A-D and Digit 0-9   
+charList = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G']
+for char in charList:
+    folder = f"/home/jaeden/training_data/CustomData/{char}"
 for img_path in glob.glob(os.path.join(folder, "*.jpg")): 
     img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
     img_resized = cv2.resize(img, (20, 20))
     if img is not None:
         digit_images.append(img_resized)
-        digit_labels.append(0)
-        
-        
-folder = f"/home/jaeden/training_data/CustomData/1"
-for img_path in glob.glob(os.path.join(folder, "*.jpg")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(1)
-        
-        
-folder = f"/home/jaeden/training_data/CustomData/2"
-for img_path in glob.glob(os.path.join(folder, "*.jpg")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(2)
-        
-        
-folder = f"/home/jaeden/training_data/CustomData/3"
-for img_path in glob.glob(os.path.join(folder, "*.jpg")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(3)
-        
-        
-folder = f"/home/jaeden/training_data/CustomData/4"
-for img_path in glob.glob(os.path.join(folder, "*.jpg")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(4)
-        
-        
-folder = f"/home/jaeden/training_data/CustomData/5"
-for img_path in glob.glob(os.path.join(folder, "*.jpg")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(5)
-        
-        
-folder = f"/home/jaeden/training_data/CustomData/6"
-for img_path in glob.glob(os.path.join(folder, "*.jpg")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(6)
-        
-        
-folder = f"/home/jaeden/training_data/CustomData/7"
-for img_path in glob.glob(os.path.join(folder, "*.jpg")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(7)
-        
-        
-             
-folder = f"/home/jaeden/training_data/CustomData/8"
-for img_path in glob.glob(os.path.join(folder, "*.jpg")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(8)
-        
-        
-folder = f"/home/jaeden/training_data/CustomData/9"
-for img_path in glob.glob(os.path.join(folder, "*.jpg")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append(9)
-        
-        
-folder = f"/home/jaeden/training_data/CustomData/C"
-for img_path in glob.glob(os.path.join(folder, "*.jpg")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append("C")
-        
-        
-folder = f"/home/jaeden/training_data/CustomData/D"
-for img_path in glob.glob(os.path.join(folder, "*.jpg")): 
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    img_resized = cv2.resize(img, (20, 20))
-    if img is not None:
-        digit_images.append(img_resized)
-        digit_labels.append("D")
+        digit_labels.append(char)
+ 
 
 
 # Randomise order of set of data so its passed to the model in a random order

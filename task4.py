@@ -13,8 +13,8 @@
 # limitations under the License.
 
 
-# Author: [Your Name]
-# Last Modified: 2024-09-09
+# Author: Jaeden Mah
+# Last Modified: 02/10/2025
 
 import glob
 import os
@@ -45,7 +45,7 @@ def save_output(output_path, content, output_type='txt'):
 
 def run_task4(image_path, config):
     # Wipe contents of task 1, task 2 and task 3 output directories before running
-    for outdir in ["output/task1", "output/task2", "output/task3"]:
+    for outdir in ["output/task1", "output/task2", "output/task3", "output/task4"]:
         abs_outdir = os.path.join(os.getcwd(), outdir)
         if os.path.exists(abs_outdir):
             for filename in os.listdir(abs_outdir):
@@ -60,6 +60,7 @@ def run_task4(image_path, config):
         print(f"Error: Invalid image path provided: {image_path}")
         return
 
+    # Task 1 processes all images in the provided directory
     run_task1(image_path, config)
 
     # Task 2 processes all images produced by task 1
@@ -74,6 +75,8 @@ def run_task4(image_path, config):
     # combine characters for each building from output of task 3 into one file for each building 
     output_task3_dir = os.path.join(os.getcwd(), "output/task3")
     bn_folders = sorted(glob.glob(os.path.join(output_task3_dir, 'bn*')))
+    
+    print("\n\nFinal results for task 4...........\n")
     for bn_folder in bn_folders:
         building_num = os.path.basename(bn_folder)  # e.g., 'bn3'
         task3_bn_folder = os.path.join(output_task3_dir, building_num)
@@ -84,6 +87,8 @@ def run_task4(image_path, config):
         
         char_files = sorted(glob.glob(os.path.join(task3_bn_folder, '*.txt')))
         combined_text = ""
+        
+        
         for char_file in char_files:
             with open(char_file, 'r') as f:
                 char = f.read().strip()

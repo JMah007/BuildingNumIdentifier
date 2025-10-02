@@ -13,14 +13,14 @@
 # limitations under the License.
 
 
-# Author: [Your Name]
-# Last Modified: 2024-09-09
+# Author: Jaeden Mah
+# Last Modified: 01/10/2025
 
-from fileinput import filename
+from ultralytics import YOLO
 import os
-import torch
 import cv2 as cv2
 import glob
+import shutil
 
 def save_output(output_path, content, output_type='txt'):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -49,18 +49,18 @@ def find_highest_confidence(image, detections):
         numpy.ndarray: The cropped image of the highest confidence detection,
             or None if no valid detections are found.
     """
-    # Compare leftover candidates and choose one with highest confidence score
+    # Choose detection with highest confidence score
     highest_conf = 0
     best_crop = None
     for det in detections:  
         if det[4] > highest_conf:
             highest_conf = det[4] # 5th parameter is confidence score
-            x1, y1, x2, y2, conf, cls = map(int, det[:6])  # convert to integers
+            x1, y1, x2, y2 = map(int, det[:4])  # convert to integers
             best_crop = image[y1:y2, x1:x2]
     return best_crop
 
 
-def filter_detections(image, results, conf_threshold):
+def filter_detections(image, detections, conf_threshold):
     """ Filter detections that arent possible and then select the one with highest confidence score. Only one candidate should remain.
 
     Args:
@@ -72,29 +72,43 @@ def filter_detections(image, results, conf_threshold):
         list: A list of filtered detections.
     """
     
-    # filter out candidates that have lowest possibility of being a building number
-    for det in results.xyxy[0]:
-        print("Candidate has level : ", det[4])
-        filtered_detections = results.xyxy[0][results.xyxy[0][:, 4] >= conf_threshold]
-        
-    # make sure after filtering there is still remaining candidates
-    best_crop = None
-    if filtered_detections.shape[0] != 0:
-        best_crop = find_highest_confidence(image, filtered_detections)
+    # Get detections from YOLOv8 results object
+    boxes = detections.boxes
+    dets = boxes.xyxy.cpu().numpy()  # shape: (N, 4)
+    confs = boxes.conf.cpu().numpy()  # shape: (N,)
+    # Combine into one array for filtering
+    all_dets = []
+    for i in range(len(dets)):
+        all_dets.append([*dets[i], confs[i]])
 
-        # Print results
-        results.print()
+    filtered_detections = [det for det in all_dets if det[4] >= conf_threshold]
+    
+    # If there is still detections left with conf score over threshold
+    if filtered_detections:
+        best_crop = find_highest_confidence(image, filtered_detections)
         return best_crop
+    return None
+    
     
 def run_task1(image_path, config):
-    
+    # Wipe output/task1 directory before saving new detections
+    # Assistance provided by GitHub Copilot (AI programming assistant) for removing file contents.
+    output_dir = "output/task1"
+    if os.path.exists(output_dir):
+        for f in os.listdir(output_dir):
+            file_path = os.path.join(output_dir, f)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+
     image_files = sorted(glob.glob(os.path.join(image_path, '*.jpg')))
 
-    # Load the YOLOv5 model once
-    model = torch.hub.load('/home/jaeden/yolov5', 'custom',
-                           path='/home/jaeden/yolov5/runs/train/exp7/weights/best.pt',
-                           source='local')
+    # Load the YOLOv8 model 
+    model = YOLO('/home/jaeden/BuildingNumIdentifier/data/best.pt')
 
+    print("\n\nFinal results for task 1...........\n")
+   
     for img_path in image_files:
         image = cv2.imread(img_path)
         if image is None:
@@ -106,18 +120,17 @@ def run_task1(image_path, config):
         digit = ''.join(filter(str.isdigit, filename))
 
         # Prediction using the model
-        results = model(image)
-
-
-        # If detections exist then loop through possible candidates and find most likely one
-        if results.xyxy[0].shape[0] != 0:
-            best_crop = filter_detections(image, results, 0.6) # hard code minimum confidence to 0.6
-            
-            if best_crop is not None:
-                output_path = f"output/task1/bn{digit}.png"
-                save_output(output_path, best_crop, output_type='image')
-            else:
-                print(f"Detections found but none of them were deemed valid for {img_path}.")
-        else:
+        detections_list = model.predict(source=img_path, save=False)
+        
+        if not detections_list or detections_list[0].boxes is None: # If no detections found
             print(f"No detections found for {img_path}.")
+            return
+        
+        detections = detections_list[0]
+        best_crop = filter_detections(image, detections, 0.2) # hard code minimum confidence to 0.2
+        if best_crop is not None:
+            output_path = f"output/task1/bn{digit}.png"
+            save_output(output_path, best_crop, output_type='image')
+        else:
+            print(f"Detections found but none of them were deemed valid for {img_path}.")
             

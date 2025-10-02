@@ -13,15 +13,14 @@
 # limitations under the License.
 
 
-# Author: [Your Name]
-# Last Modified: 2024-09-09
+# Author: Jaeden Mah
+# Last Modified: 02/10/2025
 
 import os
 import glob
 import pickle
+import shutil
 import cv2
-import numpy as np
-from sklearn.utils import shuffle
 from sklearn import svm
 
 
@@ -68,18 +67,21 @@ def run_task3(image_path, config):
     
     with open('data/svm_model.pkl', 'rb') as f:
         svm_linear = pickle.load(f)
+        
+    # Wipe output/task3 directory before saving new results
+    # Assistance provided by GitHub Copilot (AI programming assistant) for removing file contents.
+    output_dir = "output/task3"
+    if os.path.exists(output_dir):
+        for f in os.listdir(output_dir):
+            file_path = os.path.join(output_dir, f)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
 
 
     hog = cv2.HOGDescriptor(_winSize=(20, 20), _blockSize=(10, 10),
                                 _blockStride=(5, 5), _cellSize=(10, 10), _nbins=9)
-    
-    def extract_hog_features(images):
-        hog_features = []
-        for img in images:
-            hog_feature = hog.compute(img).flatten()
-            hog_features.append(hog_feature)
-        return np.array(hog_features)
-    
 
     # Extract label number from filename
     filename = os.path.basename(image_path)  
@@ -88,6 +90,8 @@ def run_task3(image_path, config):
         
     # Loop through all bn* folders in image_path
     bn_folders = sorted(glob.glob(os.path.join(image_path, 'bn*')))
+    
+    print("\n\nFinal results for task 3...........\n")
     for bn_folder in bn_folders:
         digit = ''.join(filter(str.isdigit, os.path.basename(bn_folder)))
         digit_folder = f"output/task3/bn{digit}"
@@ -109,3 +113,4 @@ def run_task3(image_path, config):
             img_name = os.path.splitext(os.path.basename(img_path))[0]
             output_path = os.path.join(digit_folder, f"{img_name}.txt")
             save_output(output_path, f"{predicted_label[0]}", output_type='txt')
+        print("\n\n")

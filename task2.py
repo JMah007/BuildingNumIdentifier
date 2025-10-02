@@ -13,13 +13,13 @@
 # limitations under the License.
 
 
-# Author: [Your Name]
-# Last Modified: 2024-09-09
+# Author: Jaeden Mah
+# Last Modified: 02/10/2025
 
 import glob
 import os
+import shutil
 import cv2 as cv2
-from matplotlib import pyplot as plt
 import numpy as np
 
 
@@ -48,10 +48,8 @@ def preprocess_image(image):
         numpy.ndarray: The preprocessed image.
     """
 
-    # Convert image from RGB to HSV to separate hue from intensity and use value channel (brightness) for thresholding to eleminate different background colours
     gray_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        
     processed = cv2.equalizeHist(gray_img)
     
     # Get dimensions of the cropped number region so i can apply different preprocessing for different sized images
@@ -61,7 +59,6 @@ def preprocess_image(image):
         #using median blur to remove salt and pepper noise while preserving edges better than gaussian blur
         processed = cv2.medianBlur(processed, ksize=5)
 
-    # might use adaptive thresholding as lighting might be uneven across the image
     # Thresholding to get binary image as segment only works on binary images. Smaller 5th parameter preserves more detail in digits
         processed = cv2.adaptiveThreshold(processed, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                                 cv2.THRESH_BINARY, 11, 7)
@@ -93,13 +90,14 @@ def extract_digits(image, pre_processed_image, file_name_digit):
         digit_folder (str): Folder path to save the extracted digit images.
     """
     
-    num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(pre_processed_image)
+    num_labels, _, stats, _ = cv2.connectedComponentsWithStats(pre_processed_image)
     count = 1
     img_area = image.shape[0] * image.shape[1]
     min_area = img_area / 30
     max_area = img_area / 3
+    
 
-    # Keep segments that meet minimum size requirements to filter our non digit segments
+    # Keep segments that meet minimum size requirements to filter out non-digit segments
     filtered_segments = []
     for i in range(1, num_labels):  # 0 is the background so need to start from 1 
         x, y, w, h, area = stats[i]
@@ -113,7 +111,7 @@ def extract_digits(image, pre_processed_image, file_name_digit):
 
     for segment in filtered_segments:
         x, y, w, h, area = segment
-        digit = image[y:y+h, x:x+w]
+        digit = image[y:y+h, x:x+w]   # Microsoft. (2025). Copilot (GPT-4) [Large Language Model]. https://copilot.microsoft.com/
         output_path = os.path.join(f"output/task2/bn{file_name_digit}", f"c{count}.png")
         save_output(output_path, digit, output_type='image')
         count += 1
@@ -126,9 +124,21 @@ def run_task2(image_path, config):
         image_path (str): Path to the directory holding all the input images.
         config (dict): Configuration parameters for the task.
     """
+    # Wipe output/task2 directory before saving new results
+    # Assistance provided by GitHub Copilot (AI programming assistant) for removing file contents.
+    output_dir = "output/task2"
+    if os.path.exists(output_dir):
+        for f in os.listdir(output_dir):
+            file_path = os.path.join(output_dir, f)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+  
+    image_files = sorted(glob.glob(os.path.join(image_path, '*.png'))) # Extract the image files from the directory. Microsoft. (2025). Copilot (GPT-4) [Large Language Model]. https://copilot.microsoft.com/
     
-    image_files = sorted(glob.glob(os.path.join(image_path, '*.png'))) # Extract the image files from the directory
-    
+    print("\n\nFinal results for task 2...........\n")
+       
     for img_path in image_files:
         image = cv2.imread(img_path)
         if image is None:
@@ -140,8 +150,6 @@ def run_task2(image_path, config):
         file_name_digit = ''.join(filter(str.isdigit, filename)) 
 
         pre_processed_image = preprocess_image(image)            
-        
-
 
         extract_digits(image, pre_processed_image, file_name_digit)
-
+        print("\n\n")
