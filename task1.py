@@ -105,7 +105,7 @@ def run_task1(image_path, config):
     image_files = sorted(glob.glob(os.path.join(image_path, '*.jpg')))
 
     # Load the YOLOv8 model 
-    model = YOLO('/home/jaeden/BuildingNumIdentifier/data/best.pt')
+    model = YOLO('./data/best.pt')
 
     print("\n\nFinal results for task 1...........\n")
    

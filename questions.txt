@@ -1,9 +1,0 @@
-
-
-issues
-detecting things in neutral images so need more neutral images with lots of noise
-not not detecting large numbers on bricks so need more of those 
-not classifying digits correctly so need more digit images from campus and need to augment them 
-need to add data for alphabet probably need to make my own using photos of campus alphabets
-
-make sure it handles exceptions
